@@ -1,40 +1,19 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Sander de Leeuw <s.deleeuw@gmail.com>
-Date: Fri, 10 Nov 2023 21:59:49 +0000
+Date: Sat, 11 Nov 2023 22:38:35 +0000
 Subject: video: meson: add HDMI fail-safe FullHD option
 
 Original patch from: Artem Lapkin <art@khadas.com>
 https://github.com/khadas/khadas-uboot/blob/master/packages/u-boot-mainline/patches/v2021.10/meson64.patches/0029-video-meson-add-HDMI-fail-save-FullHD-option.patch
 ---
- drivers/video/meson/Kconfig     | 10 +++++
- drivers/video/meson/meson_vpu.c | 19 +++++++++-
- 2 files changed, 27 insertions(+), 2 deletions(-)
+ drivers/video/meson/meson_vpu.c | 14 ++++++++--
+ 1 file changed, 12 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/video/meson/Kconfig b/drivers/video/meson/Kconfig
-index 3c2d72d019..22704fdac8 100644
---- a/drivers/video/meson/Kconfig
-+++ b/drivers/video/meson/Kconfig
-@@ -8,5 +8,15 @@ config VIDEO_MESON
- 	bool "Enable Amlogic Meson video support"
- 	depends on VIDEO
- 	select DISPLAY
- 	help
- 	  Enable Amlogic Meson Video Processing Unit video support.
-+
-+config VIDEO_MESON_HDMI_FAIL_SAFE_FULL_HD
-+	bool "Enable HDMI fail-safe FullHD mode"
-+	depends on VIDEO_MESON
-+	default y
-+	help
-+	  Force setup FullHD display mode, if proper timing cant readed.
-+	  from display! Its happens for some 4K display, which send
-+	  unsupported high timings, but same time can works as FullHD!
-+	  Also its will be useful for suspended or disconnected displays
 diff --git a/drivers/video/meson/meson_vpu.c b/drivers/video/meson/meson_vpu.c
-index 67d4ce7b3b..ec16061218 100644
+index 67d4ce7b3b..58341597fc 100644
 --- a/drivers/video/meson/meson_vpu.c
 +++ b/drivers/video/meson/meson_vpu.c
-@@ -51,12 +51,27 @@ static int meson_vpu_setup_mode(struct udevice *dev, struct udevice *disp)
+@@ -51,12 +51,22 @@ static int meson_vpu_setup_mode(struct udevice *dev, struct udevice *disp)
  	int ret = 0;
  
  	if (disp) {
@@ -42,23 +21,18 @@ index 67d4ce7b3b..ec16061218 100644
  		if (ret) {
 -			debug("%s: Failed to read timings\n", __func__);
 -			goto cvbs;
-+			if (IS_ENABLED(CONFIG_VIDEO_MESON_HDMI_FAIL_SAFE_FULL_HD)) {
-+				printf("DISPLAY: setup fail-safe FullHD mode\n");
-+				timing.pixelclock.typ = 148500000;
-+				timing.hactive.typ = 1920;
-+				timing.hfront_porch.typ = 88;
-+				timing.hback_porch.typ = 148;
-+				timing.hsync_len.typ = 44;
-+				timing.vactive.typ = 1080;
-+				timing.vfront_porch.typ = 4;
-+				timing.vback_porch.typ = 36;
-+				timing.vsync_len.typ = 5;
-+				timing.flags = 10;
-+				timing.hdmi_monitor = true;
-+			} else {
-+				debug("%s: Failed to read timings\n", __func__);
-+				goto cvbs;
-+			}
++			printf("DISPLAY: setup fail-safe FullHD mode\n");
++			timing.pixelclock.typ = 148500000;
++			timing.hactive.typ = 1920;
++			timing.hfront_porch.typ = 88;
++			timing.hback_porch.typ = 148;
++			timing.hsync_len.typ = 44;
++			timing.vactive.typ = 1080;
++			timing.vfront_porch.typ = 4;
++			timing.vback_porch.typ = 36;
++			timing.vsync_len.typ = 5;
++			timing.flags = 10;
++			timing.hdmi_monitor = true;
  		}
  
  		uc_priv->xsize = timing.hactive.typ;
