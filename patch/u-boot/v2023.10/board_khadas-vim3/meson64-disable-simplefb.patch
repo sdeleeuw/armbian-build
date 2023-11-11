@@ -1,0 +1,29 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Sander de Leeuw <s.deleeuw@gmail.com>
+Date: Sat, 11 Nov 2023 23:22:27 +0000
+Subject: fix: vim3/meson: disable simplefb
+
+---
+ configs/khadas-vim3_defconfig | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/configs/khadas-vim3_defconfig b/configs/khadas-vim3_defconfig
+index d611124325..5bb8524ab0 100644
+--- a/configs/khadas-vim3_defconfig
++++ b/configs/khadas-vim3_defconfig
+@@ -87,11 +87,11 @@ CONFIG_USB_GADGET_DOWNLOAD=y
+ CONFIG_VIDEO=y
+ # CONFIG_VIDEO_BPP8 is not set
+ # CONFIG_VIDEO_BPP16 is not set
+ CONFIG_SYS_WHITE_ON_BLACK=y
+ CONFIG_VIDEO_MESON=y
+-CONFIG_VIDEO_DT_SIMPLEFB=y
++CONFIG_VIDEO_DT_SIMPLEFB=n
+ CONFIG_SPLASH_SCREEN=y
+ CONFIG_SPLASH_SCREEN_ALIGN=y
+ CONFIG_VIDEO_BMP_RLE8=y
+ CONFIG_BMP_16BPP=y
+ CONFIG_BMP_24BPP=y
+-- 
+Created with Armbian build tools https://github.com/armbian/build
+
